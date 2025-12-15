@@ -17,6 +17,7 @@ from . cimport io_c
 from . cimport fnf_c
 from cpython cimport array
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from libc.time cimport clock_t
 
 import os
 import tempfile
@@ -52,6 +53,7 @@ cdef class SddNode:
         wrapper._sddnode = node
         if wrapper.garbage_collected():
             return None
+        wrapper.ref()
         if sddapi_c.sdd_node_is_literal(node):
             wrapper._name = sddapi_c.sdd_node_literal(node)
         elif sddapi_c.sdd_node_is_true(node):
@@ -62,6 +64,9 @@ cdef class SddNode:
             wrapper._name = "Decision"
         return wrapper
 
+    def __del__(self):
+        # clean up _sddnode ref
+        self.deref()
 
     @property
     def id(self):
@@ -305,7 +310,6 @@ cdef class SddNode:
 
         Returns the node.
         """
-        # TODO: Should we ref every Python SDDNode object on creation and deref on Python GC?
         sddapi_c.sdd_ref(self._sddnode, self._manager._sddmanager)
 
     def deref(self):
@@ -1034,7 +1038,7 @@ cdef class SddManager:
     def set_vtree_search_convergence_threshold(self, float threshold):
         sddapi_c.sdd_manager_set_vtree_search_convergence_threshold(threshold, self._sddmanager)
 
-    def set_vtree_search_time_limit(self, float time_limit):
+    def set_vtree_search_time_limit(self, clock_t time_limit):
         """Set the time limits for the vtree search algorithm.
 
         A vtree operation is either a rotation or a swap. Times are in seconds and correspond to CPU time.
@@ -1042,7 +1046,7 @@ cdef class SddManager:
         """
         sddapi_c.sdd_manager_set_vtree_search_time_limit(time_limit, self._sddmanager)
 
-    def set_vtree_fragment_time_limit(self, float time_limit):
+    def set_vtree_fragment_time_limit(self, clock_t time_limit):
         """Set the time limits for the vtree search algorithm.
 
         A vtree operation is either a rotation or a swap. Times are in seconds and correspond to CPU time.
@@ -1050,7 +1054,7 @@ cdef class SddManager:
         """
         sddapi_c.sdd_manager_set_vtree_fragment_time_limit(time_limit, self._sddmanager)
 
-    def set_vtree_operation_time_limit(self, float time_limit):
+    def set_vtree_operation_time_limit(self, clock_t time_limit):
         """Set the time limits for the vtree search algorithm.
 
         A vtree operation is either a rotation or a swap. Times are in seconds and correspond to CPU time.
@@ -1058,7 +1062,7 @@ cdef class SddManager:
         """
         sddapi_c.sdd_manager_set_vtree_operation_time_limit(time_limit, self._sddmanager)
 
-    def set_vtree_apply_time_limit(self, float time_limit):
+    def set_vtree_apply_time_limit(self, clock_t time_limit):
         """Set the time limits for the vtree search algorithm.
 
         A vtree operation is either a rotation or a swap. Times are in seconds and correspond to CPU time.

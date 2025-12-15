@@ -27,15 +27,16 @@ typedef size_t SddNodeSize; //size of decomposition for sdd nodes, changed to si
 typedef size_t SddRefCount; //refcount, changed to size_t for cross-platform compatibility
 typedef unsigned long long SddModelCount; //model counts
 typedef double SddWmc; // weighted model count
-typedef long SddLiteral; //literals of clauses
+typedef long long SddLiteral; //literals of clauses
 typedef char SddNodeType; //holds one of two values defined next
 
 //control strings
-#define PRIsS "zu"
-#define PRInsS "u"
-#define PRIrcS "u"
-#define PRImcS "llu"
-#define PRIlitS "ld"
+#define PRIsS "zu" // SddSize
+#define PRInsS "zu" // SddNodeSize
+#define PRIrcS "zu" // SddRefCount
+#define PRImcS "llu" //SddModelCount
+#define PRIwmcS "f" // SddWmc
+#define PRIlitS "lli" //SddLiteral
 
 typedef SddSize SddID;
 
@@ -314,10 +315,10 @@ Vtree* sdd_vtree_minimize_limited(Vtree* vtree, SddManager* manager);
 
 void sdd_manager_set_vtree_search_convergence_threshold(float threshold, SddManager* manager);
 
-void sdd_manager_set_vtree_search_time_limit(float time_limit, SddManager* manager);
-void sdd_manager_set_vtree_fragment_time_limit(float time_limit, SddManager* manager);
-void sdd_manager_set_vtree_operation_time_limit(float time_limit, SddManager* manager);
-void sdd_manager_set_vtree_apply_time_limit(float time_limit, SddManager* manager);
+void sdd_manager_set_vtree_search_time_limit(clock_t time_limit, SddManager* manager);
+void sdd_manager_set_vtree_fragment_time_limit(clock_t time_limit, SddManager* manager);
+void sdd_manager_set_vtree_operation_time_limit(clock_t time_limit, SddManager* manager);
+void sdd_manager_set_vtree_apply_time_limit(clock_t time_limit, SddManager* manager);
 void sdd_manager_set_vtree_operation_memory_limit(float memory_limit, SddManager* manager);
 void sdd_manager_set_vtree_operation_size_limit(float size_limit, SddManager* manager);
 void sdd_manager_set_vtree_cartesian_product_limit(SddSize size_limit, SddManager* manager);
